@@ -1,0 +1,17 @@
+[Unit]
+Description=hamlib rigctld
+Documentation=man:rigctld(1)
+Wants=network-online.target
+After=network.target network-online.target
+
+[Service]
+Type=simple
+PIDFile=/run/rigctld.pid
+LimitNOFILE=16384
+EnvironmentFile=-/etc/rigctld.conf
+ExecStart=/usr/bin/rigctld -m ${RADIOID} -r ${COMPORT} -s ${COMSPD} -T ${NETIP} -t ${NETPORT} ${OPTIONS} 
+ExecReload=/bin/kill -HUP $MAINPID
+LimitCORE=infinity
+
+[Install]
+WantedBy=multi-user.target

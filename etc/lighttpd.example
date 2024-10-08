@@ -1,0 +1,13 @@
+server.modules += ("mod_wstunnel", "mod_alias");
+
+$HTTP["url"] =~ "^/pedalhf/socket" {
+	wstunnel.server = ( "" => ( ( "host" => "127.0.0.1", "port" => "4532" ) ) )
+	wstunnel.frame-type = "text" 
+	wstunnel.ping-interval = 30
+	server.stream-request-body  = 2
+	server.stream-response-body = 2
+}
+
+# Alias flat files
+# alias.url += ( "/pedalhf" => "/where/ever/you/put/them" )
+
