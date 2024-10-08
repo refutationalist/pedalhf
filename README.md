@@ -26,3 +26,7 @@ At that point, point to where you put it.  Since hamlib is exposed as a websocke
 
 The security here is that I'm operating in the middle of nowhere.   Security by geolocational obscurity.   It runs an a *Bicycle Area Network*, not on the wide internet.
 
+## Credit
+
+I adapted the ``rigctld`` systemd system from [this issue](https://github.com/la5nta/pat/issues/221) for the pat winlink system.
+
