@@ -1,0 +1,134 @@
+@font-face {
+	font-family: "Fira Sans SemiBold";
+	src: url("fonts/FiraSans-SemiBold.woff2") format("woff2");
+}
+
+@font-face {
+	font-family: "Fira Sans Regular";
+	src: url("fonts/FiraSans-Regular.woff2") format("woff2");
+}
+
+
+
+
+body {
+	font-family: "Fira Sans Regular";
+	color: #ccc;
+	background-color: #000;
+	padding: 0;
+	margin: 1vh 0;
+}
+
+#debug {
+	display: none;
+}
+
+#plate {
+	border-top: 1.5vh solid #333;
+	border-bottom: 1.5vh solid #333;
+	margin-bottom: 5vh;
+	position: relative;
+	font-size: 5vw;
+	width: 100vw;
+	min-height: 50vh;
+}
+#plate.rx {
+	border-top: 1.5vh solid #00d;
+	border-bottom: 1.5vh solid #00d;
+}
+#plate.tx {
+	border-top: 1.5vh solid #d00;
+	border-bottom: 1.5vh solid #d00;
+}
+
+#plate div {
+	position: absolute;
+}
+
+#plate #mode {
+	top: 0;
+	left: 0;
+}
+#plate #ptt {
+	top: 0;
+	right: 0;
+	border-radius: 2vmin;
+	padding: 0.2vmin;
+	color: #000;
+	margin: .5vmin;
+}
+#plate.rx #ptt {
+	background-color: #00f;
+}
+#plate.tx #ptt {
+	background-color: #f00;
+}
+#plate #meter {
+	bottom: 0;
+	left: 0;
+}
+#plate #freq {
+	top: 15%;
+	left: 10%;
+	right: 10%;
+	bottom: 15%;
+	line-height: 30vh;
+	text-align: center;
+	font-family: "Fira Sans SemiBold";
+	font-size: 15vw;
+	color: #fff;
+}
+#plate #freq :last-child {
+	font-size: 10vw;
+
+}
+
+#newfreq {
+	display: none;
+	position: absolute;
+	z-index: 10;
+	width: 80vw;
+	left: 10vw;
+	top: 6vh;
+	font-size: 11vh;
+}
+
+select, option, button {
+	font-family: "Fira Sans SemiBold";
+}
+
+#bottom_controls {
+	width: 100%;
+	height: 20vh;
+}
+#bottom_controls > div {
+	width: 50%;
+	float: left;
+}
+
+#bottom_controls #setmode {
+	width: 60%;
+	margin-left: 20%;
+	padding: 0;
+	height: 20vh;
+	font-size: 10vh;
+}
+
+#bottom_controls > div > button {
+	height: 20vh;
+	width: 40%;
+	margin: 0 4%;
+	font-size: 6vw;
+}
+
+#waiting {
+	background-color: rgba(0,0,0,0.5);
+	backdrop-filter: blur(5px);
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+}

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>PedalHF Rig Interface</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+	<link rel="stylesheet" href="pedalhf.css">
+<style>
+
+
+</style>
+</head>
+<body>
+	<script src="js/rigctl.class.js"></script>
+	<script src="js/main.js"></script>
+
+	<div id="plate" class="">
+		<div id="mode"></div>
+		<div id="ptt"></div>
+		<div id="meter">
+			<span id="m_type"></span>
+			<span id="m_val"></span>
+		</div>
+		<div id="freq"></div>
+	</div>
+
+	<div id="bottom_controls">
+		<div>
+			<select id="setmode">
+				<option>LSB</option>
+				<option>USB</option>
+				<option>FM</option>
+				<option>AM</option>
+			</select>
+		</div>
+		<div>
+			<button id="tuneup">UP</button>
+			<button id="tunedown">DOWN</button>
+		</div>
+	</div>
+	<input type="number" id="newfreq" value="" />
+	<div id="waiting"></div>
+
+
+	<div id="debug">
+		<ul>
+			<li>
+				<b>Freq:</b>
+				<span id="d_freq"></span>
+			</li>
+			<li>
+				<b>Mode:</b>
+				<span id="d_mode"></span>
+			</li>
+			<li>
+				<b>PTT:</b>
+				<span id="d_ptt"></span>
+			</li>
+			<li>
+				<b>Meter:</b>
+				<span id="d_meter"></span>
+			</li>
+			<li>
+				<b>Wait:</b>
+				<span id="d_wait"></span>
+			</li>
+			<li>
+				<b>Error:</b>
+				<span id="d_error"></span>
+			</li>
+		</ul>
+	</div>
+	
+</body>
+</html>
