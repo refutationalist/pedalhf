@@ -5,41 +5,71 @@
 	<title>PedalHF Rig Interface</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
 	<link rel="stylesheet" href="pedalhf.css">
-<style>
-
-
-</style>
-</head>
-<body>
 	<script src="js/rigctl.class.js"></script>
 	<script src="js/main.js"></script>
+</head>
+<body>
 
-	<div id="plate" class="">
-		<div id="mode"></div>
-		<div id="ptt"></div>
-		<div id="meter">
-			<span id="m_type"></span>
-			<span id="m_val"></span>
-		</div>
-		<div id="freq"></div>
-	</div>
+	<div id="main">
+		<div id="plate" class="">
+			<!-- column one -->
+			<div id="mode"></div>
+			<div id="label"></div>
+			<div>
+				<div id="ptt"></div>
+			</div>
 
-	<div id="bottom_controls">
-		<div>
-			<select id="setmode">
-				<option>LSB</option>
-				<option>USB</option>
-				<option>FM</option>
-				<option>AM</option>
-			</select>
+			<div id="freq"><span></span><span></span></div>
+			
+
+			<div id="meter">
+				<span id="m_type"></span>
+				<span id="m_val"></span>
+			</div>
+			<div id=""></div>
+			<div id=""></div>
 		</div>
-		<div>
-			<button id="tuneup">UP</button>
-			<button id="tunedown">DOWN</button>
+
+		<div id="controls">
+				<select id="setmode">
+					<option>LSB</option>
+					<option>USB</option>
+					<option>FM</option>
+					<option>AM</option>
+				</select>
+				<button id="tunedown">DOWN</button>
+				<button id="tuneup">UP</button>
+				<!-- pending log
+				<button id="openlog">Log</button>
+				-->
+				<div></div>
+				<button id="scan">Scan</button>
 		</div>
 	</div>
 	<input type="number" id="newfreq" value="" />
 	<div id="waiting"></div>
+
+	<div id="logger">
+		<div>
+			<label for="call">Call:</label>
+			<input id="call" type="text" />
+
+			<label for="rst_s">RSTs:</label>
+			<input type="number" id="rst_s" />
+
+			<label for="rst_r">RSTr:</label>
+			<input type="number" id="rst_r" />
+
+			<textarea id="notes"></textarea>
+
+			<button id="log_submit">Log!</button>
+			<div>
+				<div id="log_freq"></div>
+				<div id="log_mode"></div>
+			</div>
+			<button id="log_reset">Reset</button>
+		</div>
+	</div>
 
 
 	<div id="debug">
@@ -69,6 +99,7 @@
 				<span id="d_error"></span>
 			</li>
 		</ul>
+		<button id="debug_close">Close</button>
 	</div>
 	
 </body>

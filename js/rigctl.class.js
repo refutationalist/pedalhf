@@ -27,7 +27,7 @@ class rigctl {
 
 	count = {
 		current: 0,  // how many we've recieved.
-		limit: 3   // how many we're willing to send before throwing a wait
+		limit: 4   // how many we're willing to send before throwing a wait
 	};
 	waiting = false;
 
@@ -282,7 +282,7 @@ class rigctl {
 			{
 				url: "socket/",
 				name: "rigctl",
-				update: 100,
+				update: 250,
 				base: 1000000,
 				debug: false,
 				canptt: false 

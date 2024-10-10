@@ -1,8 +1,12 @@
 
 document.addEventListener("DOMContentLoaded", function() {
-	radio = new rigctl({debug: false, update: 250, canptt: true});
+	let radio = new rigctl({debug: false, update: 250, canptt: true});
+	let scan = false;
+	let increment = 0.001;
 
 	let debug_e = {
+		box:   document.querySelector("#debug"),
+		close: document.querySelector("#debug_close"),
 		freq:  document.querySelector("#d_freq"),
 		mode:  document.querySelector("#d_mode"),
 		ptt:   document.querySelector("#d_ptt"),
@@ -25,7 +29,8 @@ document.addEventListener("DOMContentLoaded", function() {
 		freq: document.querySelector("#newfreq"),
 		mode: document.querySelector("#setmode"),
 		up:   document.querySelector("#tuneup"),
-		down: document.querySelector("#tunedown")
+		down: document.querySelector("#tunedown"),
+		scan: document.querySelector("#scan")
 	};
 
 	let hold;
@@ -58,15 +63,31 @@ document.addEventListener("DOMContentLoaded", function() {
 		radio.mode = m;
 	});
 
+
+
 	// Tune up
 	modify_e.up.addEventListener("click", (evt) => {
-		radio.freq = radio.freq + 0.001;
+		radio.freq = radio.freq + increment;
 	});
 
 	// Tune down
 	modify_e.down.addEventListener("click", (evt) => {
-		radio.freq = radio.freq - 0.001;
+		radio.freq = radio.freq - increment;
 	});
+
+	// Spin mode toggle
+	modify_e.scan.addEventListener("click", (evt) => {
+
+		scan = !scan;
+
+		if (scan == true) {
+			evt.target.classList.add("pressed");
+		} else {
+			evt.target.classList.remove("pressed");
+		}
+
+	});
+	
 
 
 	// Freq from Radio
@@ -95,6 +116,15 @@ document.addEventListener("DOMContentLoaded", function() {
 			display_e.ptt.innerHTML = "RX";
 		}
 
+	});
+
+	// PTT click triggers debug
+	display_e.ptt.addEventListener("click", (evt) => {
+		debug_e.box.style.display = "block";
+	});
+	// Close debug
+	debug_e.close.addEventListener("click", (evt) => {
+		debug_e.box.style.display = "none";
 	});
 
 
