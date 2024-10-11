@@ -1,9 +1,10 @@
 
 document.addEventListener("DOMContentLoaded", function() {
-	let radio = new rigctl({debug: true, showio: true});
+	let radio = new rigctl({debug: false, showio: false});
 	let start_scan = false;
 	let increment = 0.001;
 	let scan_interval = 1000;
+	let current_band;
 
 	let debug_e = {
 		box:   document.querySelector("#debug"),
@@ -24,6 +25,7 @@ document.addEventListener("DOMContentLoaded", function() {
 		m_type:  document.querySelector("#m_type"),
 		m_val:   document.querySelector("#m_val"),
 		status:  document.querySelector("#status"),
+		label:   document.querySelector("#label"),
 		waiting: document.querySelector("#waiting")
 	};
 
@@ -43,7 +45,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
 	// Change Frequency 
 	display_e.freq.addEventListener("click", function() {
-		console.debug("frequency clicked");
 		modify_e.freq.style.display = "block";
 		modify_e.freq.focus();
 	});
@@ -51,7 +52,7 @@ document.addEventListener("DOMContentLoaded", function() {
 		if (evt.key === "Enter") {
 			let f = parseFloat(modify_e.freq.value);
 			if (!isNaN(f)) {
-				console.log(`new frequency: ${f}`);
+				if (radio.scanning) radio.unscan();
 				radio.freq = f;
 			}
 			modify_e.freq.style.display = "none";
@@ -121,10 +122,39 @@ document.addEventListener("DOMContentLoaded", function() {
 	window.addEventListener("radioFreq", (evt) => {
 		debug_e.freq.innerHTML = evt.detail.freq;
 
-		let f = `${evt.detail.freq.toFixed(5)}`;
-		let maj = f.slice(0, f.length - 2);
-		let min = f.slice(-2);
-		display_e.freq.innerHTML = `<span>${maj}</span><span>${min}</span`;
+		let f = evt.detail.freq;
+		let t = `${f.toFixed(5)}`;
+		let found = null;
+
+		display_e.freq.innerHTML = 
+			'<span>' + 
+			t.slice(0, t.length - 2) +
+			'</span><span>' +
+			t.slice(-2) +
+			'</span>';
+
+		for (const x in bands) {
+			if (f >= bands[x].low && f <= bands[x].high) {
+				found = x;
+				break;
+			} 
+		}
+
+		if (found != current_band) {
+
+			if (found == null) {
+				display_e.label.innerHTML = '';
+				display_e.label.style.background = '';
+				display_e.label.style.color = '';
+			} else {
+				display_e.label.style.background = bands[found].bg;
+				display_e.label.style.color = bands[found].fg;
+				display_e.label.innerHTML = bands[found].label;
+			}
+
+			current_band = found;
+
+		}
 
 	});
 

@@ -326,7 +326,7 @@ class rigctl {
 			{
 				url: "socket/",
 				name: "rigctl",
-				update: 500,
+				update: 1000,
 				base: 1000000,
 				debug: false,
 				canptt: false, 
