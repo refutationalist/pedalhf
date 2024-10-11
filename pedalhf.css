@@ -102,6 +102,14 @@ button.pressed {
 	border-radius: 10vmin;
 }
 
+#plate #status {
+	text-align: center;
+	background-color: #070;
+	border-radius: 3vmin;
+	color: #000;
+	visibility: hidden;
+}
+
 #newfreq {
 	display: none;
 	position: absolute;
@@ -120,7 +128,7 @@ select, option, button {
 	width: 98%;
 	height: 100%;
 	display: grid;
-	grid-template: 50% 40% / 50% 20% 20%;
+	grid-template: 50% 40% / 30% 30% 30%;
 	row-gap: 4%;
 	margin: 0 2%;
 	column-gap: 3%
@@ -153,19 +161,23 @@ select, option, button {
 #debug {
 	display: none;
 	z-index: 10;
-	width: 50%;
-	height: 40%;
+	width: 80%;
+	height: 80%;
 	position: absolute;
 	background-color: #000;
-	left: 25%;
-	top: 30%;
-	border: 5vmin solid red;
+	left: 10%;
+	top: 10%;
+	border: 2vmin solid red;
 	border-radius: 12vmin;
+}
+#debug ul {
+	margin: 5%;
 }
 #debug button {
 	position: absolute;
 	width: 30%;
 	left: 35%;
+	height: 10%;
 	bottom: 1vmin;
 }
 

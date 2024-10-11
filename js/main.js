@@ -1,8 +1,9 @@
 
 document.addEventListener("DOMContentLoaded", function() {
-	let radio = new rigctl({debug: false, update: 250, canptt: true});
-	let scan = false;
+	let radio = new rigctl({debug: true, showio: true});
+	let start_scan = false;
 	let increment = 0.001;
+	let scan_interval = 1000;
 
 	let debug_e = {
 		box:   document.querySelector("#debug"),
@@ -22,6 +23,7 @@ document.addEventListener("DOMContentLoaded", function() {
 		ptt:     document.querySelector("#ptt"),
 		m_type:  document.querySelector("#m_type"),
 		m_val:   document.querySelector("#m_val"),
+		status:  document.querySelector("#status"),
 		waiting: document.querySelector("#waiting")
 	};
 
@@ -35,6 +37,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 	let hold;
 	let rate = 2000;
+
 
 
 
@@ -59,7 +62,6 @@ document.addEventListener("DOMContentLoaded", function() {
 	// Change Mode
 	modify_e.mode.addEventListener("change", (evt) => {
 		let m = evt.target.children[ evt.target.selectedIndex ].value.trim();
-		console.log(`new mode: ${m}`);
 		radio.mode = m;
 	});
 
@@ -67,25 +69,50 @@ document.addEventListener("DOMContentLoaded", function() {
 
 	// Tune up
 	modify_e.up.addEventListener("click", (evt) => {
-		radio.freq = radio.freq + increment;
+		if (start_scan) {
+			radio.scan(increment, scan_interval);
+		} else {
+			radio.freq = radio.freq + increment;
+		}
+		start_scan = false;
+		
 	});
 
 	// Tune down
 	modify_e.down.addEventListener("click", (evt) => {
-		radio.freq = radio.freq - increment;
+		if (start_scan) {
+			radio.scan(-increment, scan_interval);
+		} else {
+			radio.freq = radio.freq - increment;
+		}
+		start_scan = false;
+		
 	});
 
-	// Spin mode toggle
+	// Scan mode toggle
 	modify_e.scan.addEventListener("click", (evt) => {
-
-		scan = !scan;
-
-		if (scan == true) {
+		start_scan = !start_scan;
+		
+		if (radio.scanning) {
+			radio.unscan();
+			// button handling will happen in event
+		} else if (start_scan == true) {
 			evt.target.classList.add("pressed");
 		} else {
 			evt.target.classList.remove("pressed");
 		}
 
+	});
+	window.addEventListener("radioScan", (evt) => {
+		start_scan = false;
+
+		if (evt.detail.scanning) {
+			modify_e.scan.classList.add("pressed");
+			display_e.status.style.visibility = "visible";
+		} else {
+			modify_e.scan.classList.remove("pressed");
+			display_e.status.style.visibility = "hidden";
+		}
 	});
 	
 
@@ -120,6 +147,9 @@ document.addEventListener("DOMContentLoaded", function() {
 
 	// PTT click triggers debug
 	display_e.ptt.addEventListener("click", (evt) => {
+		debug_e.box.style.display = "block";
+	});
+	display_e.waiting.addEventListener("click", (evt) => {
 		debug_e.box.style.display = "block";
 	});
 	// Close debug

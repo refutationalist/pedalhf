@@ -17,6 +17,7 @@ class rigctl {
 	_update;  // how often to fire the interval
 	_timer;   // the interval itself
 	_canptt;  // PTT enable
+	_showio;  // show rigctld in/out
 
 	/**
 	 * rigctl displays frequency in hz.  kind of a PITA here, so
@@ -30,6 +31,9 @@ class rigctl {
 		limit: 4   // how many we're willing to send before throwing a wait
 	};
 	waiting = false;
+
+	scanning = false;
+	_scanint; // interval for scanning
 
 
 	modes = [
@@ -46,6 +50,7 @@ class rigctl {
 	_e_radioMeter = new CustomEvent("radioMeter", { detail: this });
 	_e_radioMode  = new CustomEvent("radioMode", { detail: this });
 	_e_radioWait  = new CustomEvent("radioWait", { detail: this });
+	_e_radioScan  = new CustomEvent("radioScan", { detail: this });
 
 	_debug(stuff) {
 		if (this.debug)
@@ -128,48 +133,48 @@ class rigctl {
 	// basic attributes
 	get name() {
 		return this._state.name;
-	}
-	set name(x) { }
+	};
+	set name(x) { };
 
 	get freq() {
 		return this._state.freq;
-	}
+	};
 	set freq(x) {
-		this._send(
-			"|\\set_freq " +
-			(parseFloat(x) * this._fbase) +
-			"\n"
-		);
-	}
+		this._debug(["freq set", x]);
+		if (this.scanning) this.unscan();
+		this._setfreq(x);
+	};
 
 	get mode() {
 		return this._state.mode;
-	}
+	};
 	set mode(x) {
 		x = x.toUpperCase();
 		if (this.modes.includes(x)) {
+			this._debug(["mode set", x]);
 			this._send(`|\\set_mode ${x} -1\n`);
 		}
-	}
+	};
 
 	get strength() {
 		return this._state.strength;
-	}
-	set strength(x) { }
+	};
+	set strength(x) { };
 
 	get swr() {
 		return this._state.swr;
-	}
-	set swr(x) { }
+	};
+	set swr(x) { };
 
 	get ptt() {
 		return this._state.ptt;
-	}
+	};
 	set ptt(x) {
 		if (this._canptt == false) return;
+		this._debug(["ptt set", x]);
 		let val = (!!x) ? 1 : 0;
 		this._send(`|\\set_ptt ${val}\n`);
-	}
+	};
 
 	// composite attribute(s)
 	get meter() {
@@ -178,8 +183,47 @@ class rigctl {
 		} else {
 			return ["strength", this._state.strength ];
 		}
-	}
-	set meter(x) { }
+	};
+	set meter(x) { };
+
+	// actually set frequency
+	_setfreq(x) {
+		this._send(
+			"|\\set_freq " +
+			(parseFloat(x) * this._fbase) +
+			"\n"
+		);
+	};
+
+	// scanning mode
+	
+	scan(increment, duration = this._update) {
+
+		if (this.scanning) {
+			this._do_error("tried to start scan while already scanning");
+			return false;
+		}
+
+		increment = parseFloat(increment);
+		duration = parseInt(duration);
+		this.scanning = true;
+
+		this._debug(["beginning scan", increment, duration]);
+		this._setfreq(this.freq + increment);
+		this._scanint = setInterval(() => {
+			this._setfreq(this.freq + increment);
+		}, duration);
+
+		window.dispatchEvent(this._e_radioScan);
+		return true;
+	};
+
+	unscan() {
+		this._debug("ending scan");
+		clearInterval(this._scanint);
+		this.scanning = false;
+		window.dispatchEvent(this._e_radioScan);
+	};
 
 	_do_socket() {
 
@@ -194,7 +238,7 @@ class rigctl {
 			this.count.current = 0;
 
 			
-			this._debug(["in", evt.data]);
+			if (this._showio) console.debug('[RIGCTLD IN]', evt.data);
 			let results = {}, optcnt = 0;
 
 			let output = evt.data.split("|").map((i) => i.trim());
@@ -220,7 +264,7 @@ class rigctl {
 			if (report != "0") {
 
 				if (results.command == "get_level") {
-					this._debug("get_level failed, do not toss our an error");
+					this._debug("get_level failed, do not toss out an error");
 				} else {
 					this._do_error("Command from rigctld failed, check log");
 					console.error("failed command", output, evt.data);
@@ -262,7 +306,7 @@ class rigctl {
 
 		if (this.count.current < this.count.limit) {
 			try {
-				this._debug(["out", txt]);
+				if (this._showio) console.debug("[RIGCTLD OUT]", txt);
 				this._socket.send(txt);
 			} catch (error) {
 				this._do_error(["error sending via websocket", error]);
@@ -282,10 +326,11 @@ class rigctl {
 			{
 				url: "socket/",
 				name: "rigctl",
-				update: 250,
+				update: 500,
 				base: 1000000,
 				debug: false,
-				canptt: false 
+				canptt: false, 
+				showio: false
 			},
 			args
 		);
@@ -296,6 +341,7 @@ class rigctl {
 		this._update = config.update;
 		this._fbase = config.base;
 		this._canptt = config.canptt;
+		this._showio = config.showio;
 		this.debug = config.debug;
 
 
