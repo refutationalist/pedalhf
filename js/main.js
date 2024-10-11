@@ -1,10 +1,19 @@
 
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", async function() {
 	let radio = new rigctl({debug: false, showio: false});
 	let start_scan = false;
 	let increment = 0.001;
 	let scan_interval = 1000;
 	let current_band;
+	let bands;
+
+	try {
+		get_bands = await fetch("js/bands.json");
+		bands = await get_bands.json();
+	} catch (error) {
+		bands = [];
+	}
+
 
 	let debug_e = {
 		box:   document.querySelector("#debug"),
