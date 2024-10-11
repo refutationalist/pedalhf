@@ -229,3 +229,43 @@ select, option, button {
 #logger #call {
 	grid-column: span 3;
 }
+
+
+/* logger output */
+/* shamelessly stolen from fdlogger */
+:root {
+	--table-border: #888888;
+	--table-th-text-color: #fbfaba;
+	--table-th-bg-one: #478266;
+	--table-th-bg-two: #72A17E;
+	--table-altrow-color: rgba(255,255,255,0.25);
+	--solo-note-color: #884444;
+}
+
+
+table {
+	border-collapse: collapse;
+	border: 1px solid var(--table-border);
+	font-size: 3vmin;
+	width: 60%;
+	margin-left: 15%;
+}
+td, th {
+	border: 1px solid var(--table-border);
+	padding: .5vmin;
+}
+th {
+	color: var(--table-th-text-color);
+	background-color: var(--table-th-bg-one);
+}
+th:nth-child(even) {
+	background-color: var(--table-th-bg-two);
+	
+}
+tbody tr:nth-child(even) {
+	background-color: var(--table-altrow-color);
+}
+td {
+}
+
+
