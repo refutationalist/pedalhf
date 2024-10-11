@@ -1,19 +1,14 @@
+var radio;
 
 document.addEventListener("DOMContentLoaded", async function() {
-	let radio = new rigctl({debug: false, showio: false});
 	let start_scan = false;
 	let increment = 0.001;
 	let scan_interval = 1000;
 	let current_band;
+	let current_freq;
 	let bands;
 
-	try {
-		get_bands = await fetch("js/bands.json");
-		bands = await get_bands.json();
-	} catch (error) {
-		bands = [];
-	}
-
+	/* STEP 1: Define Elements */
 
 	let debug_e = {
 		box:   document.querySelector("#debug"),
@@ -43,14 +38,72 @@ document.addEventListener("DOMContentLoaded", async function() {
 		mode: document.querySelector("#setmode"),
 		up:   document.querySelector("#tuneup"),
 		down: document.querySelector("#tunedown"),
-		scan: document.querySelector("#scan")
+		scan: document.querySelector("#scan"),
+		log:  document.querySelector("#openlog")
 	};
 
-	let hold;
-	let rate = 2000;
+	let log_e = {
+		box:  document.querySelector("#logger"),
+		call: document.querySelector("#call"),
+		rsts: document.querySelector("#rsts"),
+		rstr: document.querySelector("#rstr"),
+		note: document.querySelector("#note"),
+		freq: document.querySelector("#log_freq"),
+		mode: document.querySelector("#log_mode"),
+		go:   document.querySelector("#log_submit"),
+		reset: document.querySelector("#log_reset")
+	};
+
+
+	// STEP 2: Helper functions (mostly for logging)
+	
+	async function log_reset() {
+		log_e.box.style.display = "none";
+
+		log_e.freq.innerHTML = null;
+		log_e.mode.innerHTML = null;
+
+		log_e.call.value = null;
+		log_e.note.value = null;
+		log_e.rsts.value = null;
+		log_e.rstr.value = null;
+	}
+
+	async function log_submit() {
+
+		let log = new FormData();
+
+		log.set("time", new Date().toISOString());
+		log.set("call", log_e.call.value.trim());
+		log.set("note", log_e.note.value.trim());
+		log.set("freq", log_e.freq.innerHTML);
+		log.set("mode", log_e.mode.innerHTML);
+		log.set("rstr", parseInt(log_e.rstr.value));
+		log.set("rsts", parseInt(log_e.rsts.value));
+
+
+		let result = await fetch(
+			"log.php",
+			{
+				method: "POST",
+				body: log
+			}
+		).then( (r) => {
+			return r.json();
+		});
+
+		if (result[0] == false) {
+			alert(`Log failed on POST: ${result[1]}`);
+		} else {
+			log_reset();
+		}
+
+
+	}
 
 
 
+	/* STEP 3: Bind to UI */
 
 	// Change Frequency 
 	display_e.freq.addEventListener("click", function() {
@@ -113,6 +166,48 @@ document.addEventListener("DOMContentLoaded", async function() {
 		}
 
 	});
+
+	// PTT click triggers debug
+	display_e.ptt.addEventListener("click", (evt) => {
+		debug_e.box.style.display = "block";
+	});
+	// so does a click on the waiting overlay.
+	display_e.waiting.addEventListener("click", (evt) => {
+		debug_e.box.style.display = "block";
+	});
+	// Close debug
+	debug_e.close.addEventListener("click", (evt) => {
+		debug_e.box.style.display = "none";
+	});
+
+
+	// Open Logger
+	modify_e.log.addEventListener("click", (evt) => {
+		log_e.box.style.display = "block";
+		log_e.freq.innerHTML = radio.freq.toFixed(5);
+		log_e.mode.innerHTML = radio.mode;
+	});
+
+	// Logger window handling
+
+	// reset and close log
+	log_e.reset.addEventListener("click", (evt) => {
+		log_reset();
+	});
+
+	log_e.go.addEventListener("click", (evt) => {
+
+		if (log_e.call.value.trim() == "") {
+			alert("Logger needs a call at the minimum.");
+			return;
+		}
+		log_submit();
+
+	});
+
+
+	/* STEP 4: Bind to events */
+
 	window.addEventListener("radioScan", (evt) => {
 		start_scan = false;
 
@@ -132,37 +227,41 @@ document.addEventListener("DOMContentLoaded", async function() {
 		debug_e.freq.innerHTML = evt.detail.freq;
 
 		let f = evt.detail.freq;
-		let t = `${f.toFixed(5)}`;
-		let found = null;
 
-		display_e.freq.innerHTML = 
-			'<span>' + 
-			t.slice(0, t.length - 2) +
-			'</span><span>' +
-			t.slice(-2) +
-			'</span>';
+		if (f != current_freq) {
+			current_freq = f;
+			let t = `${f.toFixed(5)}`;
+			let found = null;
 
-		for (const x in bands) {
-			if (f >= bands[x].low && f <= bands[x].high) {
-				found = x;
-				break;
-			} 
-		}
+			display_e.freq.innerHTML = 
+				'<span>' + 
+				t.slice(0, t.length - 2) +
+				'</span><span>' +
+				t.slice(-2) +
+				'</span>';
 
-		if (found != current_band) {
-
-			if (found == null) {
-				display_e.label.innerHTML = '';
-				display_e.label.style.background = '';
-				display_e.label.style.color = '';
-			} else {
-				display_e.label.style.background = bands[found].bg;
-				display_e.label.style.color = bands[found].fg;
-				display_e.label.innerHTML = bands[found].label;
+			for (const x in bands) {
+				if (f >= bands[x].low && f <= bands[x].high) {
+					found = x;
+					break;
+				} 
 			}
 
-			current_band = found;
+			if (found != current_band) {
 
+				if (found == null) {
+					display_e.label.innerHTML = '';
+					display_e.label.style.background = '';
+					display_e.label.style.color = '';
+				} else {
+					display_e.label.style.background = bands[found].bg;
+					display_e.label.style.color = bands[found].fg;
+					display_e.label.innerHTML = bands[found].label;
+				}
+
+				current_band = found;
+
+			}
 		}
 
 	});
@@ -182,18 +281,6 @@ document.addEventListener("DOMContentLoaded", async function() {
 			display_e.ptt.innerHTML = "RX";
 		}
 
-	});
-
-	// PTT click triggers debug
-	display_e.ptt.addEventListener("click", (evt) => {
-		debug_e.box.style.display = "block";
-	});
-	display_e.waiting.addEventListener("click", (evt) => {
-		debug_e.box.style.display = "block";
-	});
-	// Close debug
-	debug_e.close.addEventListener("click", (evt) => {
-		debug_e.box.style.display = "none";
 	});
 
 
@@ -227,12 +314,32 @@ document.addEventListener("DOMContentLoaded", async function() {
 		alert(`Error: ${evt.detail.error}`);
 	});
 
+
 	// Wait event from Radio
 	window.addEventListener("radioWait", (evt) => {
 		let x = evt.detail.waiting;
 		debug_e.wait.innerHTML = x;
 		display_e.waiting.style.display = (x) ? "block" : "none";
 	});
+
+
+	/* STEP 5: LAUNCH! */
+
+	try {
+		bands = await fetch("js/bands.json").then((r) => { return r.json(); });
+	} catch (error) {
+		bands = [];
+	}
+
+	try {
+		let php_enable = await fetch("log.php?enable=1").then((r) => { return r.json(); });
+		modify_e.log.style.visibility = "visible";
+	} catch (error) {
+		console.error("logger unavailable", error);
+	}
+
+	radio = new rigctl({debug: false, showio: false});
+	
 
 
 

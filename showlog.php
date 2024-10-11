@@ -37,6 +37,10 @@ try {
 
 <h1>PedalHF Log Output</h1>
 
+<div>
+	<a href="<?=logfile?>">[ download sqlite file ]</a>
+</div>
+
 <table>
 	<tr>
 		<th>Date</th>

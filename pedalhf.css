@@ -140,8 +140,12 @@ select, option, button {
 
 }
 
-#scan {
+#controls #scan {
 	grid-column: span 2;
+}
+
+#controls #openlog {
+	visibility: hidden;
 }
 
 #waiting {
@@ -242,13 +246,21 @@ select, option, button {
 	--solo-note-color: #884444;
 }
 
+body#showlog > div {
+	text-align: center;
+	font-size: 3vmin;
+	margin: 1vmin 0;
+}
+a, a:visited {
+	color: yellow;
+}
 
 table {
 	border-collapse: collapse;
 	border: 1px solid var(--table-border);
 	font-size: 3vmin;
 	width: 60%;
-	margin-left: 15%;
+	margin-left: 20%;
 }
 td, th {
 	border: 1px solid var(--table-border);
